@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routers import master, workforce, tracking, capacity
+from app.api.routers import master, workforce, tracking, capacity, models
 
 app = FastAPI(title="HAL Manufacturing Digital Twin API")
 
@@ -16,6 +16,7 @@ app.include_router(master.router, prefix="/api")
 app.include_router(workforce.router, prefix="/api/workforce")
 app.include_router(tracking.router, prefix="/api/tracking")
 app.include_router(capacity.router, prefix="/api/capacity")
+app.include_router(models.router, prefix="/api/models")
 
 @app.get("/health")
 def health_check():

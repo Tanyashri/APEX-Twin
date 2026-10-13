@@ -1,33 +1,35 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Text, Grid } from "@react-three/drei";
 import * as THREE from "three";
 import { useState } from "react";
 
-// Legacy material palette (matches index.html MAT)
+// Automotive metallic palette
 const C = {
   metal:      "#607080",
   metalShiny: "#90a0b0",
-  wood:       "#8B5E3C",
-  woodDark:   "#5C3D1E",
+  steelDark:  "#1e293b",
+  bodyBlue:   "#00e5ff",
   accent:     "#00e5ff",
   accent2:    "#76ff03",
   warn:       "#ff9100",
   fault:      "#ff1744",
 };
 
-const DEPT_DEFS = [
-  { name: "MECHATRONICS", pos: [-7,  0, -5] as [number,number,number], color: "#00e5ff", emissive: "#003344" },
-  { name: "FABRICS",      pos: [ 7,  0, -5] as [number,number,number], color: "#00e5ff", emissive: "#002233" },
-  { name: "SENSORS",      pos: [-7,  0,  5] as [number,number,number], color: "#ff9100", emissive: "#331500" },
-  { name: "POWER",        pos: [ 7,  0,  5] as [number,number,number], color: "#00e5ff", emissive: "#001133" },
-  { name: "ASSEMBLY",     pos: [ 0,  0,  0] as [number,number,number], color: "#ff1744", emissive: "#330011" },
+export const DEPT_DEFS = [
+  { name: "LOGISTICS",  pos: [-10, 0, -8] as [number,number,number], color: "#76ff03", title: "STAMPING & LOGISTICS" },
+  { name: "STAMPING",   pos: [-4,  0, -8] as [number,number,number], color: "#00e5ff", title: "PRESS & STAMPING" },
+  { name: "WELDING",    pos: [ 4,  0, -8] as [number,number,number], color: "#00e5ff", title: "BODY WELDING" },
+  { name: "PAINT",      pos: [ 10, 0, -8] as [number,number,number], color: "#00e5ff", title: "PAINT SHOP" },
+  { name: "POWERTRAIN", pos: [-8,  0,  4] as [number,number,number], color: "#ff9100", title: "BATTERY & POWERTRAIN" },
+  { name: "ASSEMBLY",   pos: [ 0,  0,  0] as [number,number,number], color: "#ff1744", title: "FINAL ASSEMBLY" },
+  { name: "QUALITY",    pos: [ 8,  0,  4] as [number,number,number], color: "#76ff03", title: "QUALITY & DYNAMO" },
 ];
 
-function DepartmentPod({ position, color, emissive, name, onClick }: {
-  position: [number,number,number]; color: string; emissive: string; name: string; onClick: (n: string) => void;
+function DepartmentPod({ position, color, name, title, onClick }: {
+  position: [number,number,number]; color: string; name: string; title: string; onClick: (n: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const lightRef = useRef<THREE.PointLight>(null!);
@@ -35,8 +37,8 @@ function DepartmentPod({ position, color, emissive, name, onClick }: {
   useFrame(({ clock }) => {
     if (lightRef.current) {
       lightRef.current.intensity = hovered
-        ? 3.0 + Math.sin(clock.getElapsedTime() * 4) * 0.6
-        : 1.0 + Math.sin(clock.getElapsedTime() * 1.5) * 0.3;
+        ? 3.2 + Math.sin(clock.getElapsedTime() * 4) * 0.6
+        : 1.1 + Math.sin(clock.getElapsedTime() * 1.5) * 0.3;
     }
   });
 
@@ -49,171 +51,243 @@ function DepartmentPod({ position, color, emissive, name, onClick }: {
     >
       {/* Platform */}
       <mesh position={[0, 0.1, 0]} receiveShadow>
-        <boxGeometry args={[5, 0.2, 5]} />
+        <boxGeometry args={[4.4, 0.2, 4.4]} />
         <meshStandardMaterial color={color} transparent opacity={hovered ? 0.5 : 0.3} roughness={0.4} metalness={0.6} emissive={color} emissiveIntensity={hovered ? 0.4 : 0.12} />
       </mesh>
 
-      {/* Machines */}
-      {name === "MECHATRONICS" && <MechMachines hovered={hovered} />}
-      {name === "FABRICS"      && <FabricsMachines />}
-      {name === "SENSORS"      && <SensorsMachines hovered={hovered} />}
-      {name === "POWER"        && <PowerMachines />}
-      {name === "ASSEMBLY"     && <AssemblyMachines />}
+      {/* Automotive Manufacturing Machines */}
+      {name === "LOGISTICS"  && <LogisticsMachines hovered={hovered} />}
+      {name === "STAMPING"   && <StampingPressMachine hovered={hovered} />}
+      {name === "WELDING"    && <WeldingRoboticsMachine hovered={hovered} />}
+      {name === "PAINT"      && <PaintShopMachine hovered={hovered} />}
+      {name === "POWERTRAIN" && <PowertrainSkateboardMachine hovered={hovered} />}
+      {name === "ASSEMBLY"   && <FinalAssemblyLineMachine hovered={hovered} />}
+      {name === "QUALITY"    && <QualityInspectionMachine hovered={hovered} />}
 
       {/* Label */}
-      <Text position={[0, 3.2, 0]} fontSize={0.38} color={color} anchorX="center" anchorY="middle" outlineWidth={0.025} outlineColor="#000000">
-        {name}
+      <Text position={[0, 3.2, 0]} fontSize={0.30} color={color} anchorX="center" anchorY="middle" outlineWidth={0.025} outlineColor="#000000">
+        {title}
       </Text>
 
       {/* Status light pulse */}
-      <pointLight ref={lightRef} color={color} intensity={1.0} distance={8} position={[0, 2.5, 0]} />
+      <pointLight ref={lightRef} color={color} intensity={1.0} distance={7} position={[0, 2.2, 0]} />
     </group>
   );
 }
 
-function MechMachines({ hovered }: { hovered: boolean }) {
-  const motorRef = useRef<THREE.Mesh>(null!);
-  useFrame(({ clock }) => { if (motorRef.current) motorRef.current.rotation.y = clock.getElapsedTime() * 2; });
+// 0. Materials & Automated Logistics Staging (Automated Guided Vehicles / Racks)
+function LogisticsMachines({ hovered }: { hovered: boolean }) {
+  const agvRef = useRef<THREE.Group>(null!);
+  useFrame(({ clock }) => {
+    if (agvRef.current) {
+      agvRef.current.position.z = Math.sin(clock.getElapsedTime() * 1.5) * 0.6;
+    }
+  });
+
   return (
     <group>
-      <mesh ref={motorRef} position={[0, 0.9, 0]} castShadow>
-        <cylinderGeometry args={[0.6, 0.6, 1.4, 16]} />
-        <meshStandardMaterial color={C.metalShiny} roughness={0.3} metalness={0.8} />
+      {/* High-Bay Storage Racks */}
+      {[-1.2, 1.2].map((x, i) => (
+        <group key={i} position={[x, 0.8, 0]}>
+          <mesh castShadow><boxGeometry args={[0.6, 1.6, 2.8]} /><meshStandardMaterial color={C.steelDark} roughness={0.7} /></mesh>
+          {[-0.8, 0, 0.8].map((z, j) => (
+            <mesh key={j} position={[0, 0.2, z]} castShadow><boxGeometry args={[0.5, 0.35, 0.6]} /><meshStandardMaterial color="#3b82f6" metalness={0.4} /></mesh>
+          ))}
+        </group>
+      ))}
+      {/* Automated Guided Vehicle (AGV) */}
+      <group ref={agvRef} position={[0, 0.25, 0]}>
+        <mesh castShadow><boxGeometry args={[0.9, 0.25, 1.3]} /><meshStandardMaterial color="#f59e0b" roughness={0.3} metalness={0.7} /></mesh>
+        <mesh position={[0, 0.2, 0]}><boxGeometry args={[0.7, 0.18, 0.9]} /><meshStandardMaterial color="#64748b" metalness={0.8} /></mesh>
+        <pointLight color="#76ff03" intensity={0.8} distance={2} position={[0, 0.3, 0]} />
+      </group>
+    </group>
+  );
+}
+
+// 1. Hydraulic Stamping Press with Coil Feed
+function StampingPressMachine({ hovered }: { hovered: boolean }) {
+  const ramRef = useRef<THREE.Mesh>(null!);
+  useFrame(({ clock }) => {
+    if (ramRef.current) {
+      ramRef.current.position.y = 0.9 + Math.sin(clock.getElapsedTime() * 3) * 0.22;
+    }
+  });
+
+  return (
+    <group>
+      <mesh position={[0, 0.45, 0]} castShadow>
+        <boxGeometry args={[2.0, 0.5, 1.8]} />
+        <meshStandardMaterial color={C.steelDark} roughness={0.5} metalness={0.7} />
       </mesh>
-      <mesh position={[0, 0.9, 0]} castShadow>
-        <cylinderGeometry args={[0.12, 0.12, 2.4, 8]} />
-        <meshStandardMaterial color={C.metal} roughness={0.4} metalness={0.8} />
-      </mesh>
-      {([-1.2, 1.2] as number[]).map((x, i) => (
-        <mesh key={i} position={[x, 0.9, 0]} castShadow>
-          <cylinderGeometry args={[0.32, 0.32, 0.18, 12]} />
+      {[[-0.8, 0, -0.7], [0.8, 0, -0.7], [-0.8, 0, 0.7], [0.8, 0, 0.7]].map((pos, i) => (
+        <mesh key={i} position={[pos[0], 1.25, pos[2]]} castShadow>
+          <cylinderGeometry args={[0.09, 0.09, 1.6, 16]} />
           <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
         </mesh>
       ))}
-      {/* Control box */}
-      <mesh position={[1.7, 0.7, 1.5]} castShadow>
-        <boxGeometry args={[0.7, 1.0, 0.45]} />
-        <meshStandardMaterial color={C.metal} roughness={0.4} metalness={0.7} />
+      <mesh ref={ramRef} position={[0, 1.1, 0]} castShadow>
+        <boxGeometry args={[1.6, 0.45, 1.4]} />
+        <meshStandardMaterial color={C.metal} roughness={0.3} metalness={0.8} />
       </mesh>
-      <mesh position={[1.7, 0.85, 1.73]}>
-        <boxGeometry args={[0.45, 0.28, 0.02]} />
-        <meshStandardMaterial color="#001122" emissive="#00e5ff" emissiveIntensity={hovered ? 0.9 : 0.4} />
+      <mesh position={[-1.5, 0.7, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.45, 0.45, 0.4, 16]} />
+        <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
       </mesh>
     </group>
   );
 }
 
-function FabricsMachines() {
+// 2. Robotic Body Welding Cell with Unibody Fixture
+function WeldingRoboticsMachine({ hovered }: { hovered: boolean }) {
+  const sparkRef = useRef<THREE.PointLight>(null!);
+  useFrame(({ clock }) => {
+    if (sparkRef.current) {
+      sparkRef.current.intensity = Math.random() > 0.4 ? 2.5 : 0.2;
+    }
+  });
+
   return (
     <group>
-      {([-1.6, 1.6] as number[]).map((x, i) => (
-        <group key={i} position={[x, 0, 0]}>
-          <mesh position={[0, 1.2, 0]} castShadow><boxGeometry args={[0.18, 2.4, 0.18]} /><meshStandardMaterial color={C.woodDark} roughness={0.85} /></mesh>
-          <mesh position={[0, 1.2, 1.6]} castShadow><boxGeometry args={[0.18, 2.4, 0.18]} /><meshStandardMaterial color={C.woodDark} roughness={0.85} /></mesh>
-        </group>
+      <mesh position={[0, 0.35, 0]} castShadow>
+        <boxGeometry args={[2.6, 0.35, 1.5]} />
+        <meshStandardMaterial color={C.steelDark} roughness={0.6} metalness={0.7} />
+      </mesh>
+      {[-0.9, 0.9].map((x, i) => (
+        <mesh key={i} position={[x, 1.0, 0]} castShadow>
+          <boxGeometry args={[0.08, 0.9, 1.3]} />
+          <meshStandardMaterial color={C.metalShiny} roughness={0.3} metalness={0.85} />
+        </mesh>
       ))}
-      <mesh position={[0, 0.55, 1.5]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.18, 0.18, 3.2, 16]} />
-        <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
+      <mesh position={[-1.3, 0.7, 1.0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.7, 12]} />
+        <meshStandardMaterial color={C.warn} roughness={0.4} metalness={0.6} />
       </mesh>
-      <mesh position={[0, 0.5, 0.2]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.14, 0.14, 3.2, 16]} />
-        <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
+      <mesh position={[1.3, 0.7, -1.0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.7, 12]} />
+        <meshStandardMaterial color={C.warn} roughness={0.4} metalness={0.6} />
       </mesh>
-      <mesh position={[0, 1.5, 0.8]} castShadow>
-        <boxGeometry args={[3.0, 0.08, 0.06]} />
-        <meshStandardMaterial color="#4488aa" roughness={0.4} metalness={0.6} />
+      <pointLight ref={sparkRef} color="#00e5ff" intensity={1.5} distance={5} position={[0, 1.1, 0]} />
+    </group>
+  );
+}
+
+// 3. Paint Cleanroom Chamber with Dual Robotic Spray Heads
+function PaintShopMachine({ hovered }: { hovered: boolean }) {
+  return (
+    <group>
+      <mesh position={[0, 0.3, 0]} castShadow>
+        <boxGeometry args={[2.8, 0.25, 2.0]} />
+        <meshStandardMaterial color={C.steelDark} roughness={0.8} />
       </mesh>
-      <mesh position={[0, 2.3, 0]} castShadow>
-        <boxGeometry args={[3.5, 0.2, 0.2]} />
-        <meshStandardMaterial color={C.wood} roughness={0.8} />
+      <mesh position={[0, 0.75, 0]} castShadow>
+        <boxGeometry args={[2.2, 0.6, 1.2]} />
+        <meshStandardMaterial color={C.bodyBlue} roughness={0.1} metalness={0.6} />
+      </mesh>
+      <mesh position={[0, 1.6, 0]}>
+        <boxGeometry args={[2.4, 0.1, 0.2]} />
+        <meshStandardMaterial color={C.metalShiny} metalness={0.9} />
+      </mesh>
+      <mesh position={[-0.6, 1.25, 0]}>
+        <coneGeometry args={[0.3, 0.5, 16]} />
+        <meshStandardMaterial color="#93c5fd" transparent opacity={0.5} emissive="#93c5fd" emissiveIntensity={0.6} />
+      </mesh>
+      <mesh position={[0.6, 1.25, 0]}>
+        <coneGeometry args={[0.3, 0.5, 16]} />
+        <meshStandardMaterial color="#93c5fd" transparent opacity={0.5} emissive="#93c5fd" emissiveIntensity={0.6} />
       </mesh>
     </group>
   );
 }
 
-function SensorsMachines({ hovered }: { hovered: boolean }) {
-  const boardRef = useRef<THREE.Group>(null!);
-  useFrame(({ clock }) => { if (boardRef.current) boardRef.current.rotation.y = clock.getElapsedTime() * 0.9; });
+// 4. EV Skateboard Powertrain & Battery Carrier
+function PowertrainSkateboardMachine({ hovered }: { hovered: boolean }) {
   return (
     <group>
-      <mesh position={[0, 0.6, 0]} castShadow>
-        <boxGeometry args={[1.4, 0.9, 1.0]} />
-        <meshStandardMaterial color={C.metal} roughness={0.4} metalness={0.7} />
+      <mesh position={[0, 0.35, 0]} castShadow>
+        <boxGeometry args={[2.8, 0.25, 1.5]} />
+        <meshStandardMaterial color={C.steelDark} roughness={0.4} metalness={0.8} />
       </mesh>
-      <mesh position={[0, 0.65, 0.51]}>
-        <boxGeometry args={[0.9, 0.55, 0.02]} />
-        <meshStandardMaterial color="#001122" emissive="#ff9100" emissiveIntensity={hovered ? 0.9 : 0.35} />
+      {[-0.7, -0.15, 0.4, 0.85].map((x, i) => (
+        <mesh key={i} position={[x, 0.52, 0]}>
+          <boxGeometry args={[0.38, 0.15, 1.2]} />
+          <meshStandardMaterial color="#1e3a8a" emissive="#2563eb" emissiveIntensity={0.6} />
+        </mesh>
+      ))}
+      <mesh position={[-1.1, 0.4, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.26, 0.26, 1.1, 16]} />
+        <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
       </mesh>
-      <group ref={boardRef} position={[0, 1.5, 0]}>
-        {([0, 1, 2, 3] as number[]).map((i) => (
-          <mesh key={i} position={[Math.cos((i / 4) * Math.PI * 2) * 0.9, 0, Math.sin((i / 4) * Math.PI * 2) * 0.9]} castShadow>
-            <boxGeometry args={[0.3, 0.04, 0.4]} />
-            <meshStandardMaterial color="#1a5c2a" roughness={0.3} metalness={0.4} emissive="#00e5ff" emissiveIntensity={hovered ? 0.6 : 0.12} />
+      <mesh position={[1.1, 0.4, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.26, 0.26, 1.1, 16]} />
+        <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+// 5. Final Assembly Marriage & Rolling Chassis
+function FinalAssemblyLineMachine({ hovered }: { hovered: boolean }) {
+  return (
+    <group>
+      <mesh position={[0, 0.35, 0]} receiveShadow castShadow>
+        <boxGeometry args={[3.2, 0.25, 1.8]} />
+        <meshStandardMaterial color={C.steelDark} roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.95, 0]} castShadow>
+        <boxGeometry args={[2.6, 0.65, 1.3]} />
+        <meshStandardMaterial color={C.bodyBlue} roughness={0.2} metalness={0.7} />
+      </mesh>
+      <mesh position={[-0.2, 1.45, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.45, 1.15]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.1} metalness={0.9} />
+      </mesh>
+      {[[-0.9, 0.5, -0.72], [0.9, 0.5, -0.72], [-0.9, 0.5, 0.72], [0.9, 0.5, 0.72]].map((pos, i) => (
+        <mesh key={i} position={[pos[0], pos[1], pos[2]]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.34, 0.34, 0.2, 16]} />
+          <meshStandardMaterial color="#09090b" roughness={0.9} metalness={0.1} />
+        </mesh>
+      ))}
+      <mesh position={[0, 2.0, 0]}>
+        <sphereGeometry args={[0.16, 12, 12]} />
+        <meshStandardMaterial color="#ff1744" emissive="#ff1744" emissiveIntensity={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+// 6. Quality Assurance, Dynamometer & ADAS Calibration Tunnel
+function QualityInspectionMachine({ hovered }: { hovered: boolean }) {
+  const rollerRef = useRef<THREE.Group>(null!);
+  useFrame(({ clock }) => {
+    if (rollerRef.current) {
+      rollerRef.current.rotation.x = clock.getElapsedTime() * 4;
+    }
+  });
+
+  return (
+    <group>
+      <mesh position={[0, 0.3, 0]} castShadow>
+        <boxGeometry args={[3.0, 0.2, 1.8]} />
+        <meshStandardMaterial color={C.steelDark} roughness={0.6} />
+      </mesh>
+      {/* Dyno Test Rollers */}
+      <group ref={rollerRef} position={[0, 0.45, 0]}>
+        {[-0.8, 0.8].map((x, i) => (
+          <mesh key={i} position={[x, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.18, 0.18, 1.4, 16]} />
+            <meshStandardMaterial color={C.metalShiny} metalness={0.9} />
           </mesh>
         ))}
       </group>
-      {([-0.8, 0, 0.8] as number[]).map((x, i) => (
-        <mesh key={i} position={[x, 0.2, 1.4]} castShadow>
-          <cylinderGeometry args={[0.1, 0.1, 0.3, 8]} />
-          <meshStandardMaterial color={C.metalShiny} roughness={0.2} metalness={0.9} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function PowerMachines() {
-  return (
-    <group>
-      <mesh position={[-0.8, 1.0, 0]} castShadow>
-        <boxGeometry args={[1.0, 1.8, 0.8]} />
-        <meshStandardMaterial color={C.metal} roughness={0.4} metalness={0.7} />
+      {/* Light Tunnel Arch */}
+      <mesh position={[0, 1.2, 0]}>
+        <boxGeometry args={[2.6, 1.4, 0.15]} />
+        <meshStandardMaterial color="#1e293b" />
       </mesh>
-      <mesh position={[-0.8, 1.4, 0.41]}>
-        <boxGeometry args={[0.6, 0.4, 0.02]} />
-        <meshStandardMaterial color="#000a14" emissive="#00e5ff" emissiveIntensity={0.55} />
-      </mesh>
-      <mesh position={[0.8, 0.9, 0]} castShadow>
-        <boxGeometry args={[0.9, 1.6, 0.7]} />
-        <meshStandardMaterial color="#4a5568" roughness={0.4} metalness={0.6} />
-      </mesh>
-      {([0, 0.32, 0.64] as number[]).map((y, i) => (
-        <mesh key={i} position={[0.8, 0.4 + y, 0.36]}>
-          <sphereGeometry args={[0.07, 8, 8]} />
-          <meshStandardMaterial color={i === 0 ? "#76ff03" : i === 1 ? "#ff9100" : "#00e5ff"} emissive={i === 0 ? "#76ff03" : i === 1 ? "#ff9100" : "#00e5ff"} emissiveIntensity={0.9} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0.2, 0.85]} castShadow>
-        <boxGeometry args={[2.0, 0.14, 0.12]} />
-        <meshStandardMaterial color="#111111" roughness={0.9} />
-      </mesh>
-    </group>
-  );
-}
-
-function AssemblyMachines() {
-  return (
-    <group>
-      {([[-1.8, 0, -1.2], [1.8, 0, -1.2], [-1.8, 0, 1.2], [1.8, 0, 1.2]] as [number,number,number][]).map(([x,,z], i) => (
-        <mesh key={i} position={[x, 1.2, z]} castShadow>
-          <boxGeometry args={[0.18, 2.4, 0.18]} />
-          <meshStandardMaterial color={C.woodDark} roughness={0.85} />
-        </mesh>
-      ))}
-      <mesh position={[0, 2.3, -1.2]} castShadow><boxGeometry args={[3.8, 0.2, 0.18]} /><meshStandardMaterial color={C.wood} roughness={0.8} /></mesh>
-      <mesh position={[0, 2.3,  1.2]} castShadow><boxGeometry args={[3.8, 0.2, 0.18]} /><meshStandardMaterial color={C.wood} roughness={0.8} /></mesh>
-      <mesh position={[0, 2.5, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.12, 0.12, 4.0, 12]} />
-        <meshStandardMaterial color={C.metalShiny} roughness={0.15} metalness={0.95} />
-      </mesh>
-      <mesh position={[0, 0.45, 0]} receiveShadow castShadow>
-        <boxGeometry args={[3.4, 0.12, 2.2]} />
-        <meshStandardMaterial color={C.wood} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 3.1, 0]}>
-        <sphereGeometry args={[0.2, 12, 12]} />
-        <meshStandardMaterial color="#ff1744" emissive="#ff1744" emissiveIntensity={0.7} roughness={0.4} metalness={0.2} />
+      <mesh position={[0, 1.8, 0]}>
+        <boxGeometry args={[2.2, 0.1, 1.6]} />
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1.2} />
       </mesh>
     </group>
   );
@@ -222,7 +296,7 @@ function AssemblyMachines() {
 function FlowParticle({ from, to, color, delay = 0 }: { from: [number,number,number]; to: [number,number,number]; color: string; delay?: number }) {
   const meshRef = useRef<THREE.Mesh>(null!);
   useFrame(({ clock }) => {
-    const t = ((clock.getElapsedTime() * 0.32 + delay) % 1);
+    const t = ((clock.getElapsedTime() * 0.28 + delay) % 1);
     if (meshRef.current) {
       meshRef.current.position.x = THREE.MathUtils.lerp(from[0], to[0], t);
       meshRef.current.position.y = THREE.MathUtils.lerp(from[1] + 0.4, to[1] + 0.4, t) + Math.sin(t * Math.PI) * 0.6;
@@ -232,7 +306,7 @@ function FlowParticle({ from, to, color, delay = 0 }: { from: [number,number,num
   });
   return (
     <mesh ref={meshRef} castShadow>
-      <boxGeometry args={[0.3, 0.3, 0.3]} />
+      <boxGeometry args={[0.25, 0.25, 0.25]} />
       <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.7} roughness={0.3} metalness={0.4} />
     </mesh>
   );
@@ -248,51 +322,55 @@ export default function Factory3D({
   return (
     <div style={{ width: "100%", height: "100%", position: "absolute", top: 0, left: 0 }}>
       <Canvas
-        camera={{ position: [2, 12, 20], fov: 48 }}
+        camera={{ position: [0, 18, 22], fov: 42 }}
         shadows
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: isLightMode ? 1.0 : 1.1 }}
-        style={{ background: isLightMode ? "#e6edf3" : "#0a0c0f", transition: "background 0.3s ease" }}
+        style={{ background: isLightMode ? "#eef2f6" : "#080a0d", transition: "background 0.3s ease" }}
       >
-        {/* Lighting */}
-        <ambientLight color={isLightMode ? 0xffffff : 0x1a2030} intensity={isLightMode ? 1.2 : 0.8} />
-        <directionalLight color={0xffffff} intensity={isLightMode ? 1.1 : 0.9} position={[6, 10, 6]} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
-        <directionalLight color={isLightMode ? 0xa0c4ff : 0x2040ff} intensity={isLightMode ? 0.4 : 0.3} position={[-5, 3, -3]} />
-        <directionalLight color={isLightMode ? 0x0077ff : 0x00e5ff} intensity={0.4} position={[0, 6, -8]} />
+        <ambientLight intensity={isLightMode ? 1.6 : 0.8} />
+        <directionalLight position={[10, 22, 10]} intensity={isLightMode ? 1.5 : 0.8} castShadow />
+        <pointLight position={[0, 12, 0]} intensity={isLightMode ? 1.0 : 0.6} color="#00e5ff" />
 
-        {/* Floor */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-          <planeGeometry args={[80, 80]} />
-          <meshStandardMaterial color={isLightMode ? "#dbe3eb" : "#0d1017"} roughness={0.95} metalness={0.05} />
-        </mesh>
-
-        {/* Grid lines */}
+        {/* Floor grid */}
         <Grid
-          args={[60, 60]}
-          position={[0, 0.002, 0]}
-          cellColor={isLightMode ? "#cbd5e1" : "#1e2530"}
-          sectionColor={isLightMode ? "#94a3b8" : "#1a2030"}
-          fadeDistance={50}
-          fadeStrength={1}
+          position={[0, 0, 0]}
+          args={[42, 42]}
+          cellSize={1.2}
+          cellThickness={0.6}
+          cellColor={isLightMode ? "#cbd5e1" : "#111827"}
+          sectionSize={6}
+          sectionThickness={1.2}
+          sectionColor={isLightMode ? "#94a3b8" : "#00e5ff"}
+          fadeDistance={34}
+          fadeStrength={1.5}
         />
 
+        {/* Complete 7 Automotive Manufacturing Pods */}
         {DEPT_DEFS.map((d) => (
-          <DepartmentPod key={d.name} position={d.pos} color={d.color} emissive={d.emissive} name={d.name} onClick={onPodClick} />
+          <DepartmentPod
+            key={d.name}
+            position={d.pos}
+            color={d.color}
+            name={d.name}
+            title={d.title}
+            onClick={onPodClick}
+          />
         ))}
 
-        {/* Flow particles: feeder depts -> ASSEMBLY */}
-        <FlowParticle from={[-7, 0, -5]} to={[0, 0, 0]} color="#00e5ff" delay={0.0} />
-        <FlowParticle from={[-7, 0, -5]} to={[0, 0, 0]} color="#00e5ff" delay={0.55} />
-        <FlowParticle from={[ 7, 0, -5]} to={[0, 0, 0]} color="#00e5ff" delay={0.2} />
-        <FlowParticle from={[ 7, 0, -5]} to={[0, 0, 0]} color="#00e5ff" delay={0.75} />
-        <FlowParticle from={[-7, 0,  5]} to={[0, 0, 0]} color="#ff9100" delay={0.85} />
-        <FlowParticle from={[ 7, 0,  5]} to={[0, 0, 0]} color="#00e5ff" delay={0.35} />
+        {/* Flow particles from upstream lines to Assembly, and from Assembly to Quality */}
+        <FlowParticle from={[-10, 0, -8]} to={[-4, 0, -8]} color="#76ff03" delay={0.0} />
+        <FlowParticle from={[-4,  0, -8]} to={[ 4, 0, -8]} color="#00e5ff" delay={0.2} />
+        <FlowParticle from={[ 4,  0, -8]} to={[10, 0, -8]} color="#00e5ff" delay={0.4} />
+        <FlowParticle from={[10,  0, -8]} to={[ 0, 0,  0]} color="#00e5ff" delay={0.6} />
+        <FlowParticle from={[-8,  0,  4]} to={[ 0, 0,  0]} color="#ff9100" delay={0.3} />
+        <FlowParticle from={[ 0,  0,  0]} to={[ 8, 0,  4]} color="#76ff03" delay={0.8} />
 
         <OrbitControls
           makeDefault
-          minPolarAngle={0.1}
-          maxPolarAngle={Math.PI / 2 - 0.05}
-          minDistance={6}
-          maxDistance={40}
+          enableDamping
+          dampingFactor={0.05}
+          minDistance={8}
+          maxDistance={44}
+          maxPolarAngle={Math.PI / 2.08}
         />
       </Canvas>
     </div>

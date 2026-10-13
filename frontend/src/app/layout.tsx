@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Powerloom Manufacturing Digital Twin — HAL",
-  description: "5-Department Factory Digital Twin: Component Tracking, Capacity Intelligence, Load Balancing & Prediction",
+  title: "APEX-Twin — Automotive Cyber-Physical Digital Twin",
+  description: "7-Department Automotive Plant Digital Twin: Real-Time Telematics, Authoritative Capacity Intelligence, and MLOps Retraining",
 };
 
 export default function RootLayout({

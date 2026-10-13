@@ -355,7 +355,7 @@ body.light-mode .theme-btn:hover {
   padding: 16px 20px;
   color: var(--text);
   font-family: var(--font-mono);
-  overflow: hidden;
+  overflow-y: auto;
   transition: background 0.3s ease, color 0.3s ease;
 }
 body.light-mode .dept-modal {

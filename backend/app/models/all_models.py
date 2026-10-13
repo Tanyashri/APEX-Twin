@@ -229,3 +229,61 @@ class AttendanceLog(Base):
     check_in = Column(DateTime(timezone=True), nullable=False)
     check_out = Column(DateTime(timezone=True), nullable=True)
     workstation_id = Column(String, ForeignKey("workstation.id"), nullable=True)
+
+class ModelRun(Base):
+    __tablename__ = "model_run"
+    id = Column(String, primary_key=True, default=generate_uuid)
+    run_id = Column(String, unique=True, index=True, nullable=False)
+    model_type = Column(String, nullable=False, default="BUILD_TIME_QUANTILE") # BUILD_TIME_QUANTILE, WORKLOAD_HOLT_WINTERS
+    status = Column(String, nullable=False, default="QUEUED") # QUEUED, RUNNING, SUCCEEDED, FAILED
+    trigger_type = Column(String, nullable=False, default="MANUAL") # MANUAL, DRIFT_PSI, PERFORMANCE_DEGRADATION, SCHEDULED
+    dataset_version = Column(String, nullable=True)
+    num_samples = Column(Integer, nullable=True, default=0)
+    params_json = Column(JSON, nullable=True)
+    metrics_json = Column(JSON, nullable=True)
+    segment_metrics_json = Column(JSON, nullable=True)
+    logs = Column(String, nullable=True)
+    error = Column(String, nullable=True)
+    duration_s = Column(Float, nullable=True)
+    mlflow_run_id = Column(String, nullable=True)
+    artifact_path = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    finished_at = Column(DateTime(timezone=True), nullable=True)
+
+class ModelArtifact(Base):
+    __tablename__ = "model_artifact"
+    id = Column(String, primary_key=True, default=generate_uuid)
+    version = Column(String, unique=True, index=True, nullable=False)
+    run_id = Column(String, ForeignKey("model_run.id"), nullable=True)
+    model_type = Column(String, nullable=False, default="BUILD_TIME_QUANTILE")
+    role = Column(String, nullable=False, default="CANDIDATE") # CHAMPION, CHALLENGER, PREVIOUS, CANDIDATE, RETIRED
+    is_active = Column(Boolean, nullable=False, default=False)
+    artifact_path = Column(String, nullable=True)
+    metrics_summary_json = Column(JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    promoted_at = Column(DateTime(timezone=True), nullable=True)
+    rolled_back_at = Column(DateTime(timezone=True), nullable=True)
+
+class ModelPromotionAudit(Base):
+    __tablename__ = "model_promotion_audit"
+    id = Column(String, primary_key=True, default=generate_uuid)
+    action = Column(String, nullable=False) # PROMOTE, ROLLBACK, REJECT
+    from_version = Column(String, nullable=True)
+    to_version = Column(String, nullable=True)
+    reason = Column(String, nullable=True)
+    actor = Column(String, nullable=False, default="system")
+    metrics_comparison_json = Column(JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+class PlanningAuditLog(Base):
+    __tablename__ = "planning_audit_log"
+    id = Column(String, primary_key=True, default=generate_uuid)
+    entity_type = Column(String, nullable=False) # SHIFT, WORKSTATION, WORKER, MATERIAL, THRESHOLD
+    entity_id = Column(String, nullable=True)
+    parameter_name = Column(String, nullable=False)
+    old_value = Column(String, nullable=True)
+    new_value = Column(String, nullable=False)
+    actor = Column(String, nullable=False, default="planner")
+    reason = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
