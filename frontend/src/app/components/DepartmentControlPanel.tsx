@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Box, Cylinder, Sphere } from "@react-three/drei";
 import * as THREE from "three";
-import { useRef } from "react";
 import CapacityTrendChart from "./CapacityTrendChart";
+import PartProcessPipelineVisualizer from "./PartProcessPipelineVisualizer";
 
 // Automobile Department-specific 3D models
 function DeptModel({ dept, isLightMode = false }: { dept: string; isLightMode?: boolean }) {
@@ -1457,61 +1457,17 @@ export default function DepartmentControlPanel({
                   </div>
                 </div>
 
-                {/* 5-Stage Step-by-Step Production Process Lineage */}
-                <div>
-                  <div style={{ fontSize: 9, color: textMuted, fontWeight: "bold", letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>
-                    Step-by-Step Manufacturing Process Lineage
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
-                    {stages.map((st) => {
-                      const isComplete = st.status === "COMPLETED";
-                      const isInProgress = st.status === "IN PROGRESS";
-                      const borderCol = isInProgress ? accent : isComplete ? accentGreen : "var(--border)";
-                      const bgCol = isInProgress
-                        ? "rgba(0, 229, 255, 0.12)"
-                        : isComplete
-                        ? "rgba(118, 255, 3, 0.08)"
-                        : "rgba(255, 255, 255, 0.02)";
-
-                      return (
-                        <div
-                          key={st.step}
-                          style={{
-                            border: `1px solid ${borderCol}`,
-                            background: bgCol,
-                            padding: "8px 10px",
-                            borderRadius: 6,
-                            position: "relative",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 4,
-                          }}
-                        >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: 8, color: textMuted, fontFamily: "var(--font-mono)" }}>
-                              STEP 0{st.step}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: 8,
-                                fontWeight: "bold",
-                                color: isInProgress ? accent : isComplete ? accentGreen : textMuted,
-                              }}
-                            >
-                              {isComplete ? "✓ DONE" : isInProgress ? "⚡ ACTIVE" : "⏳ QUEUE"}
-                            </span>
-                          </div>
-                          <div style={{ fontSize: 10, fontWeight: "bold", color: textPrimary, lineHeight: 1.3 }}>
-                            {st.name}
-                          </div>
-                          <div style={{ fontSize: 8, color: textMuted, marginTop: "auto" }}>
-                            {st.machine} ({st.time})
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                {/* Cyber-Physical Machine Model & Conveyor Process Pipeline */}
+                <PartProcessPipelineVisualizer
+                  partCode={currentSelectedPart.code}
+                  partName={currentSelectedPart.name}
+                  dept={dept}
+                  stages={stages}
+                  cycleElapsed={cycleElapsed}
+                  isLightMode={internalLightMode}
+                  activeMachineName={activeMachine ? activeMachine.name : "Station Alpha"}
+                  activeOperator={activeMachine ? activeMachine.operator : "Lead Technician"}
+                />
               </div>
             );
           })()}
