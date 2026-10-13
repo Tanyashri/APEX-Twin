@@ -116,7 +116,63 @@ $$\mathcal{L}_\alpha(y, \hat{y}) = \max\left(\alpha (y - \hat{y}), (1 - \alpha)(
 
 ---
 
-## 🧪 4. Interactive Operational Scenario Simulator
+## ⚙️ 4. Department Machinery Fleet & Workstation Specifications
+
+Every department features dedicated industrial machinery with real-time operational telemetry, live utilization tracking, predictive health metrics, and automated PLC synchronization:
+
+| Department | Machine Identifier | Machinery Description & Architecture | Real-Time Operating Parameter |
+|---|:---:|---|---|
+| **Stamping** | `M-STMP-01` | Schuler 2,500T Hydraulic Tandem Transfer Press | Die Clamping Force: **24,800 kN** (12 strokes/min) |
+| **Stamping** | `M-STMP-02` | High-Speed Sheet Decoiler & Precision Roller Leveler | Feed Rate: **42 m/min** (Strip width 1,600mm) |
+| **Stamping** | `M-STMP-03` | Trumpf TruLaser 12kW CNC 3D Blanking & Piercing Cell | Fiber Laser Power: **11.8 kW** (Focus: 0.12mm) |
+| **Welding** | `M-WELD-01` | Unibody Framing Main Geometrical Fixture (Gate Cell) | Hydraulic Clamping: **±0.035 mm** repeatability |
+| **Welding** | `M-WELD-02` | Fanuc R-2000iC/210F 6-Axis Spot-Welding Robot Alpha | Weld Current: **14.2 kA** / Tip Force: **4.2 kN** |
+| **Welding** | `M-WELD-04` | Trumpf TruDisk 8001 Fiber Laser Roof-Brazing Cell | Beam Power: **7.8 kW** / Seam Speed: **4.2 m/min** |
+| **Paint** | `M-PNT-01` | Cathodic Electrocoat (E-Coat) RoDip Immersion Tank | Bath Temp: **28.5°C** / Voltage: **315 V DC** |
+| **Paint** | `M-PNT-02` | Dürr EcoBell3 High-Speed Rotary Atomizer Array | Turbine Speed: **55,000 RPM** / Flow: **420 ml/min** |
+| **Paint** | `M-PNT-04` | Convection & Catalytic Infrared Curing Bake Tunnel | Zone Temperature: **142°C** (Zone 3/4) |
+| **Powertrain**| `M-PWR-01` | 82 kWh Structural Battery Skateboard Assembly Jig | Insulation Resistance: **780 MΩ** (>500 required) |
+| **Powertrain**| `M-PWR-02` | High-Voltage Busbar Multi-Spindle Electric Torquer | Applied Torque: **9.8 Nm ± 0.1** (Angle: 90°) |
+| **Powertrain**| `M-PWR-03` | CNC Liquid Thermal Interface Material (TIM) Dispenser | Bead Volume: **1,240 ml** (Pressure: 120 bar) |
+| **Assembly** | `M-ASY-01` | Heavy-Duty Skateboard-to-Chassis Marriage Lift | Lift Stroke: **1,850 mm** (Synchronized Dual-Column) |
+| **Assembly** | `M-ASY-02` | Atlas Copco 5-Spindle Automated Wheel Lug Nut Torquer | Fastener Torque: **140 Nm ± 1.2** (Simultaneous 5-Spindle) |
+| **Assembly** | `M-ASY-03` | Robotic Windshield & Panoramic Glass Polyurethane Applicator | Bead Height: **11.8 mm** / Width: **8.5 mm** |
+| **Quality** | `M-QA-01` | 4-Wheel High-Speed Chassis Dynamometer Roller Bench | Max Speed: **135 km/h** / Regen: **48 kW** |
+| **Quality** | `M-QA-02` | Laser 3D Optical 4-Wheel Steering & Toe/Camber Rig | Toe-in: **+0.02°** / Camber: **-0.48°** (Pass) |
+| **Quality** | `M-QA-04` | High-Pressure Monsoon Water Ingress Chamber (IPX9K) | Water Pressure: **15.2 bar** (Flow: 650 L/min) |
+| **Logistics** | `M-LOG-01` | Automated Guided Vehicle (AGV) Heavy Tugger Fleet Alpha | LiDAR Navigation (Battery: **88%**, Speed: **1.8 m/s**) |
+
+---
+
+## ⏱️ 5. Live Part Manufacturing Process Tracker
+
+In addition to static Bill of Materials (BOM) reporting, APEX-Twin provides **real-time component process tracking** for every active part:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  LIVE COMPONENT TRACKER: STP-HOOD-01 (Aluminum Engine Hood Outer Skin)                 │
+│  Target VIN: VIN-2026-X80-0042  •  Lot: LOT-STMP-2026-A  •  Qty: 48 Units             │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  Live Cycle Meter: [████████████████████░░░░░░░░░] 28s / 54s Takt Cycle (52%)         │
+│  Active Workstation: Schuler 2,500T Hydraulic Transfer Press (M-STMP-01)               │
+│  Station Operator: T. Vance (Master Die Setter)                                        │
+│  In-Line Metrology: Clamping 24,800 kN • Temp 64.5°C • Tolerance ±0.02mm (PASS ✓)     │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+- **Sequential 5-Station Process Lineage:**
+  Tracks the exact step-by-step station progression for any component:
+  1. `STEP 01: Raw Coil Decoiling & Sheet Blanking` ➔ **COMPLETED (12s)**
+  2. `STEP 02: 2,500T Deep Draw Forming` ➔ **COMPLETED (24s)**
+  3. `STEP 03: CNC Laser Trimming & Flanging` ➔ **ACTIVE IN PROGRESS (⚡ Live Ticking Counter)**
+  4. `STEP 04: In-Line Optical Metrology & CMM Laser Scan` ➔ **QUEUED (14s)**
+  5. `STEP 05: Automated AGV Staging to BIW Welding Gate` ➔ **QUEUED (20s)**
+- **Real-Time Takt Progress Gauge:** Animated gradient progress bar updating live every second to model sub-minute takt execution.
+- **One-Click Part Switcher:** Operators can click `[TRACK LIVE ⚡]` on any BOM part or use the component selector dropdown to switch tracking contexts instantaneously.
+
+---
+
+## 🧪 6. Interactive Operational Scenario Simulator
 
 The dashboard incorporates a test case switcher allowing plant directors and industrial engineers to stress-test factory resilience against four predefined industrial scenarios:
 
@@ -129,7 +185,7 @@ The dashboard incorporates a test case switcher allowing plant directors and ind
 
 ---
 
-## 💻 5. Technical Architecture & Data Topology
+## 💻 7. Technical Architecture & Data Topology
 
 ```
                                   BROWSER CLIENT
@@ -161,7 +217,7 @@ The dashboard incorporates a test case switcher allowing plant directors and ind
 
 ---
 
-## 🛠️ 6. Quickstart & Local Installation
+## 🛠️ 8. Quickstart & Local Installation
 
 ### Prerequisites
 - **Python:** 3.11+
@@ -206,7 +262,7 @@ npm start
 
 ---
 
-## 🧪 7. Automated Verification Suite
+## 🧪 9. Automated Verification Suite
 
 APEX-Twin includes 39 unit, integration, and mathematical boundary tests:
 
@@ -232,7 +288,7 @@ backend/tests/test_workforce.py ....                                     [100%]
 
 ---
 
-## 📜 8. Engineering Standards & Compliance
+## 📜 10. Engineering Standards & Compliance
 
 - **ISO 22400-2**: Key Performance Indicators for Manufacturing Operations Management (OEE, Availability, Net Productive Time).
 - **Lean Manufacturing**: Takt time analysis, line balancing, and buffer starvation minimization.
@@ -240,5 +296,5 @@ backend/tests/test_workforce.py ....                                     [100%]
 
 ---
 
-## 📄 License
+## 📄 11. License
 This project is licensed under the **MIT License** — open and accessible for advanced research and enterprise digital twin applications.
