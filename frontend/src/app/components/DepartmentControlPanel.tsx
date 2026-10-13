@@ -271,6 +271,496 @@ const DEPT_COMPONENTS: Record<string, Array<{ code: string; name: string; qty: n
   ],
 };
 
+// Complete 7-Department Automotive Machinery & Equipment Catalog
+export interface MachineInfo {
+  id: string;
+  name: string;
+  type: string;
+  status: "RUNNING" | "NOMINAL" | "HIGH_LOAD" | "MAINTENANCE" | "STANDBY";
+  statusType: "ok" | "warn" | "fault";
+  currentPart: string;
+  partName: string;
+  operator: string;
+  metricLabel: string;
+  metricValue: string;
+  health: number;
+  cycleTime: string;
+}
+
+const DEPT_MACHINES: Record<string, MachineInfo[]> = {
+  LOGISTICS: [
+    {
+      id: "M-LOG-01",
+      name: "Automated Guided Vehicle (AGV) Heavy Tugger Fleet Alpha",
+      type: "LiDAR Navigation Heavy Tugger",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "LOG-STEEL-COIL",
+      partName: "High-Strength Steel Sheet Coils",
+      operator: "R. Gomez (Logistics Lead)",
+      metricLabel: "Battery / Speed",
+      metricValue: "88% / 1.8 m/s",
+      health: 98,
+      cycleTime: "240s route",
+    },
+    {
+      id: "M-LOG-02",
+      name: "High-Bay Automated Coil & Sheet Storage Stacker",
+      type: "AS/RS Twin-Mast Crane",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "LOG-STEEL-COIL",
+      partName: "Steel Sheet Staging Rack",
+      operator: "Automated PLC Unit #4",
+      metricLabel: "Hoist Load / Speed",
+      metricValue: "4.2T / 90 m/min",
+      health: 96,
+      cycleTime: "45s retrieval",
+    },
+    {
+      id: "M-LOG-03",
+      name: "KUKA Automated Battery Cell Depalletizer Gantry",
+      type: "6-Axis Heavy Gantry Robot",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "LOG-BAT-BUFFER",
+      partName: "HV Battery Cell Buffer Rack",
+      operator: "E. Morales (Robotics Tech)",
+      metricLabel: "Vacuum Pressure",
+      metricValue: "-85 kPa (Secure)",
+      health: 99,
+      cycleTime: "8s / cell pack",
+    },
+    {
+      id: "M-LOG-04",
+      name: "High-Speed Overhead Tire & Wheel Monorail Conveyor",
+      type: "Overhead Electric Monorail (EMS)",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "LOG-TIRE-CONV",
+      partName: "Tire & Wheel Overhead Feed",
+      operator: "S. Tanaka (Systems Operator)",
+      metricLabel: "Line Speed / Feed",
+      metricValue: "35 m/min",
+      health: 94,
+      cycleTime: "22s / set of 4",
+    },
+  ],
+  STAMPING: [
+    {
+      id: "M-STMP-01",
+      name: "Schuler 2,500T Hydraulic Tandem Transfer Press",
+      type: "High-Tonnage Hydraulic Draw Press",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "STP-HOOD-01",
+      partName: "Aluminum Hood Outer Skin",
+      operator: "T. Vance (Master Die Setter)",
+      metricLabel: "Die Clamping Force",
+      metricValue: "24,800 kN (Nominal)",
+      health: 95,
+      cycleTime: "12 strokes/min",
+    },
+    {
+      id: "M-STMP-02",
+      name: "High-Speed Sheet Decoiler & Precision Roller Leveler",
+      type: "Continuous Coil Feed System",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "STP-DOOR-LH",
+      partName: "Door High-Strength Sheet",
+      operator: "J. Miller (Coil Technician)",
+      metricLabel: "Feed Rate / Strip Width",
+      metricValue: "42 m/min / 1,600mm",
+      health: 97,
+      cycleTime: "Continuous feed",
+    },
+    {
+      id: "M-STMP-03",
+      name: "Trumpf TruLaser 12kW CNC 3D Blanking & Piercing Cell",
+      type: "Fiber Laser 3D Trimming Rig",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "STP-FENDER-01",
+      partName: "Aerodynamic Fender Blank",
+      operator: "A. Kowalski (Laser Specialist)",
+      metricLabel: "Laser Power / Focus",
+      metricValue: "11.8 kW / 0.12mm",
+      health: 92,
+      cycleTime: "18s / blank",
+    },
+    {
+      id: "M-STMP-04",
+      name: "Automated Vacuum End-Effector Stamped Panel Stacker",
+      type: "Robotic Destacking & Racking Unit",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "STP-DOOR-RH",
+      partName: "Right Door Inner Panel",
+      operator: "Automated Robotic Cell #2",
+      metricLabel: "Suction Pressure / Count",
+      metricValue: "-92 kPa / 420 pcs",
+      health: 98,
+      cycleTime: "6s / panel",
+    },
+  ],
+  WELDING: [
+    {
+      id: "M-WELD-01",
+      name: "Main Unibody Framing Geometrical Fixture (Gate Cell)",
+      type: "Multi-Point Hydraulic Clamping Tooling",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "WLD-FLOOR-01",
+      partName: "Underbody Floorpan Subassembly",
+      operator: "M. Chen (Robotics Tech Lead)",
+      metricLabel: "Clamp Repeatability",
+      metricValue: "±0.035 mm (Tolerance ±0.05)",
+      health: 94,
+      cycleTime: "52s / unibody",
+    },
+    {
+      id: "M-WELD-02",
+      name: "Fanuc R-2000iC/210F 6-Axis Spot-Welding Robot Alpha",
+      type: "Medium-Frequency DC Spot Welder",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "WLD-SIDE-LH",
+      partName: "B-Pillar Reinforcement Ring",
+      operator: "M. Chen (Tech Lead)",
+      metricLabel: "Weld Current / Tip Force",
+      metricValue: "14.2 kA / 4.2 kN",
+      health: 96,
+      cycleTime: "1.2s / spot (48 spots)",
+    },
+    {
+      id: "M-WELD-03",
+      name: "Fanuc R-2000iC/210F 6-Axis Spot-Welding Robot Beta",
+      type: "Medium-Frequency DC Spot Welder",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "WLD-SIDE-RH",
+      partName: "B-Pillar Right Reinforcement",
+      operator: "K. Lindqvist (Welding Eng)",
+      metricLabel: "Weld Current / Tip Force",
+      metricValue: "14.4 kA / 4.1 kN",
+      health: 95,
+      cycleTime: "1.2s / spot (48 spots)",
+    },
+    {
+      id: "M-WELD-04",
+      name: "Trumpf TruDisk 8001 Laser Roof-Brazing Clean Cell",
+      type: "8kW Fiber Laser Continuous Seam Rig",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "WLD-CAGE-04",
+      partName: "Safety Roll Cage / Roof Seam",
+      operator: "D. Novak (Laser Welder)",
+      metricLabel: "Beam Power / Seam Speed",
+      metricValue: "7.8 kW / 4.2 m/min",
+      health: 98,
+      cycleTime: "24s / roof seam",
+    },
+  ],
+  PAINT: [
+    {
+      id: "M-PNT-01",
+      name: "Cathodic Electrocoat (E-Coat) Dip Immersion Tank",
+      type: "12-Dip RoDip Cathodic Immersion Cell",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "PNT-ED-DIP",
+      partName: "Unibody Immersion Primer",
+      operator: "L. Moreau (Finishing Chemist)",
+      metricLabel: "Bath Temp / Voltage",
+      metricValue: "28.5°C / 315 V DC",
+      health: 97,
+      cycleTime: "180s immersion",
+    },
+    {
+      id: "M-PNT-02",
+      name: "Dürr EcoBell3 High-Speed Rotary Atomizer Array",
+      type: "Electrostatic Bell Applicators (7-Axis Gantry)",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "PNT-BASE-BLU",
+      partName: "Arctic Blue Metallic Basecoat",
+      operator: "F. Rossi (Paint Line Sup)",
+      metricLabel: "Turbine RPM / Paint Flow",
+      metricValue: "55,000 RPM / 420 ml/min",
+      health: 93,
+      cycleTime: "48s / vehicle coat",
+    },
+    {
+      id: "M-PNT-03",
+      name: "Cross-Draft Cleanroom Air Regulation & Humidity Pod",
+      type: "ISO Class 5 Air Filtration Chamber",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "PNT-CLEAR-2K",
+      partName: "Anti-Scratch 2K Clearcoat",
+      operator: "Automated HVAC Loop",
+      metricLabel: "Air Velocity / Rel. Humidity",
+      metricValue: "0.45 m/s / 62% RH",
+      health: 99,
+      cycleTime: "Continuous purge",
+    },
+    {
+      id: "M-PNT-04",
+      name: "Convection & Catalytic Infrared Curing Bake Tunnel",
+      type: "Zone-Controlled Curing Oven",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "PNT-OVEN-140",
+      partName: "140°C Curing & Baking",
+      operator: "C. Weber (Thermal Ops)",
+      metricLabel: "Tunnel Zone Temp",
+      metricValue: "142°C (Zone 3/4)",
+      health: 95,
+      cycleTime: "22 min continuous",
+    },
+  ],
+  POWERTRAIN: [
+    {
+      id: "M-PWR-01",
+      name: "82 kWh Structural Battery Skateboard Assembly Jig",
+      type: "Cell-to-Pack (CTP) Pneumatic Clamping Rig",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "PWR-BATT-82K",
+      partName: "82 kWh High-Voltage Battery",
+      operator: "A. Patel (High-Voltage Lead)",
+      metricLabel: "Insulation Resistance",
+      metricValue: "780 MΩ (>500 required)",
+      health: 98,
+      cycleTime: "110s / battery pack",
+    },
+    {
+      id: "M-PWR-02",
+      name: "Automated High-Voltage Busbar Multi-Spindle Torquer",
+      type: "Controlled-Angle Electric Nutrunner Rig",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "PWR-HARN-HV",
+      partName: "Shielded Busbar Harness",
+      operator: "T. Thorne (Assembly Tech)",
+      metricLabel: "Applied Torque / Angle",
+      metricValue: "9.8 Nm ± 0.1 / 90°",
+      health: 96,
+      cycleTime: "3.5s / terminal",
+    },
+    {
+      id: "M-PWR-03",
+      name: "Automated Liquid Thermal Interface Material (TIM) Dispenser",
+      type: "CNC 2-Component Polyurethane Dispenser",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "PWR-THERM-P",
+      partName: "Liquid Battery Thermal Chiller",
+      operator: "Automated Dispenser #1",
+      metricLabel: "Bead Volume / Dispense P",
+      metricValue: "1,240 ml / 120 bar",
+      health: 94,
+      cycleTime: "28s / cooling plate",
+    },
+    {
+      id: "M-PWR-04",
+      name: "Dual Permanent Magnet E-Drive Planetary Gear Integration Rig",
+      type: "High-Precision Spline Alignment Cell",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "PWR-DRV-DUAL",
+      partName: "Dual E-Drive Motor Unit",
+      operator: "R. Sharma (Drive Specialist)",
+      metricLabel: "Backlash / Runout",
+      metricValue: "0.07 mm / 0.012 mm",
+      health: 97,
+      cycleTime: "45s / gearbox",
+    },
+  ],
+  ASSEMBLY: [
+    {
+      id: "M-ASY-01",
+      name: "Heavy-Duty Overhead Skateboard-to-Chassis Marriage Lift",
+      type: "Dual-Column Hydraulic Synchronized Lift",
+      status: "HIGH_LOAD",
+      statusType: "fault",
+      currentPart: "ASY-CHASS-MAR",
+      partName: "Chassis & Skateboard Marriage",
+      operator: "K. Becker (Line Superintendent)",
+      metricLabel: "Lift Stroke / Load Index",
+      metricValue: "1,850 mm / 104% (Overload)",
+      health: 88,
+      cycleTime: "68s (Target: 54s)",
+    },
+    {
+      id: "M-ASY-02",
+      name: "Atlas Copco 5-Spindle Automated Wheel Lug Nut Multi-Torquer",
+      type: "Simultaneous 5-Axis Electric Nutrunner",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "ASY-WHEEL-TOR",
+      partName: "Wheel Lug Nut Fasteners",
+      operator: "P. Santos (Assembly Operator)",
+      metricLabel: "Torque / Angle Target",
+      metricValue: "140 Nm ± 1.2 / 90°",
+      health: 97,
+      cycleTime: "8s / wheel (4 wheels)",
+    },
+    {
+      id: "M-ASY-03",
+      name: "Robotic Windshield & Panoramic Glass Polyurethane Applicator",
+      type: "KUKA 6-Axis Adhesive Dispensing Cell",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "ASY-GLAZ-GLS",
+      partName: "Acoustic Glass Glazing",
+      operator: "J. Larsson (Glazing Tech)",
+      metricLabel: "Bead Height / Bead Width",
+      metricValue: "11.8 mm / 8.5 mm",
+      health: 96,
+      cycleTime: "32s / windshield",
+    },
+    {
+      id: "M-ASY-04",
+      name: "Cockpit Dashboard & Digital Instrument Modular Manipulator",
+      type: "Zero-Gravity Pneumatic Assist Arm",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "ASY-COCKPIT",
+      partName: "Cockpit Module Assembly",
+      operator: "L. Zhang & M. Scott",
+      metricLabel: "Payload / Insertion Force",
+      metricValue: "65 kg / 45 N (Guided)",
+      health: 95,
+      cycleTime: "45s / cockpit",
+    },
+  ],
+  QUALITY: [
+    {
+      id: "M-QA-01",
+      name: "4-Wheel High-Speed Chassis Dynamometer Roller Bench",
+      type: "Twin-Roller Regenerative Test Dyno",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "QA-DYNO-TEST",
+      partName: "Chassis Dynamometer Run",
+      operator: "D. Ross (Chief Metrologist)",
+      metricLabel: "Max Test Speed / Regen KW",
+      metricValue: "135 km/h / 48 kW Regen",
+      health: 98,
+      cycleTime: "120s / vehicle run",
+    },
+    {
+      id: "M-QA-02",
+      name: "Laser 3D Optical 4-Wheel Steering & Camber/Toe Metrology Rig",
+      type: "8-Camera High-Resolution Laser Arch",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "QA-ALIGN-4W",
+      partName: "Laser 4-Wheel Alignment",
+      operator: "E. Fischer (QA Engineer)",
+      metricLabel: "Toe-in / Camber Deviation",
+      metricValue: "+0.02° / -0.48° (PASS)",
+      health: 99,
+      cycleTime: "35s / vehicle",
+    },
+    {
+      id: "M-QA-03",
+      name: "Forward ADAS Camera, Radar & Solid-State LiDAR Target Calibration",
+      type: "Optical Target Array & Frequency Scanner",
+      status: "NOMINAL",
+      statusType: "ok",
+      currentPart: "QA-ADAS-RADAR",
+      partName: "ADAS Radar Target Calibration",
+      operator: "S. Gupta (Electronics QA)",
+      metricLabel: "Radar Beam Azimuth / Elev",
+      metricValue: "0.01° / 0.00° (Calibrated)",
+      health: 97,
+      cycleTime: "42s / vehicle",
+    },
+    {
+      id: "M-QA-04",
+      name: "High-Pressure Monsoon Water Ingress Chamber (IPX9K)",
+      type: "96-Nozzle 15-Bar Recirculating Water Rig",
+      status: "RUNNING",
+      statusType: "ok",
+      currentPart: "QA-RAIN-CHAM",
+      partName: "Monsoon Ingress Testing",
+      operator: "Automated QA Cell #4",
+      metricLabel: "Water Pressure / Flow",
+      metricValue: "15.2 bar / 650 L/min",
+      health: 96,
+      cycleTime: "180s cycle",
+    },
+  ],
+};
+
+function getPartProcessStages(partCode: string, dept: string) {
+  if (dept === "STAMPING") {
+    return [
+      { step: 1, name: "Coil Uncoiling & Washing", machine: "M-STMP-02 (Decoiler)", time: "12s", status: "COMPLETED" },
+      { step: 2, name: "CNC Blanking & Shearing", machine: "M-STMP-03 (Laser Cell)", time: "18s", status: "COMPLETED" },
+      { step: 3, name: "2,500T Deep Draw Forming", machine: "M-STMP-01 (Hydraulic Press)", time: "24s", status: "IN PROGRESS" },
+      { step: 4, name: "Laser Trimming & Flanging", machine: "M-STMP-03 (Trimming)", time: "14s", status: "QUEUED" },
+      { step: 5, name: "Automated Stacking & CMM Scan", machine: "M-STMP-04 (Stacker)", time: "10s", status: "QUEUED" },
+    ];
+  }
+  if (dept === "WELDING") {
+    return [
+      { step: 1, name: "Sub-assembly Jig Clamping", machine: "M-WELD-01 (Gate Fixture)", time: "16s", status: "COMPLETED" },
+      { step: 2, name: "Robotic Spot Welding Pass 1", machine: "M-WELD-02 (Fanuc Alpha)", time: "28s", status: "COMPLETED" },
+      { step: 3, name: "Robotic Spot Welding Pass 2", machine: "M-WELD-03 (Fanuc Beta)", time: "24s", status: "IN PROGRESS" },
+      { step: 4, name: "Continuous Laser Roof Brazing", machine: "M-WELD-04 (Trumpf Laser)", time: "20s", status: "QUEUED" },
+      { step: 5, name: "Ultrasonic Weld QA Scan", machine: "Non-Destructive Rig", time: "12s", status: "QUEUED" },
+    ];
+  }
+  if (dept === "PAINT") {
+    return [
+      { step: 1, name: "Degrease & Phosphate Dip", machine: "Pre-Treatment Tunnel", time: "45s", status: "COMPLETED" },
+      { step: 2, name: "Cathodic E-Coat Immersion", machine: "M-PNT-01 (RoDip Tank)", time: "90s", status: "COMPLETED" },
+      { step: 3, name: "PVC Underbody Seam Sealing", machine: "Sealing Robot Cell", time: "35s", status: "COMPLETED" },
+      { step: 4, name: "Metallic Basecoat Spraying", machine: "M-PNT-02 (EcoBell3)", time: "48s", status: "IN PROGRESS" },
+      { step: 5, name: "2K Anti-Scratch Oven Bake", machine: "M-PNT-04 (140°C IR Oven)", time: "120s", status: "QUEUED" },
+    ];
+  }
+  if (dept === "POWERTRAIN") {
+    return [
+      { step: 1, name: "Prismatic Cell Module Stacking", machine: "M-LOG-03 (Cell Gantry)", time: "30s", status: "COMPLETED" },
+      { step: 2, name: "Liquid Thermal TIM Dispense", machine: "M-PWR-03 (TIM Dispenser)", time: "28s", status: "COMPLETED" },
+      { step: 3, name: "High-Voltage Busbar Torquing", machine: "M-PWR-02 (Busbar Rig)", time: "40s", status: "IN PROGRESS" },
+      { step: 4, name: "BMS Flash & Dielectric HiPot Test", machine: "M-PWR-01 (Insulation Rig)", time: "22s", status: "QUEUED" },
+      { step: 5, name: "Dual E-Axle Planetary Marriage", machine: "M-PWR-04 (Spline Cell)", time: "45s", status: "QUEUED" },
+    ];
+  }
+  if (dept === "ASSEMBLY") {
+    return [
+      { step: 1, name: "Cockpit Module Harnessing", machine: "M-ASY-04 (Manipulator)", time: "45s", status: "COMPLETED" },
+      { step: 2, name: "Windshield Polyurethane Glaze", machine: "M-ASY-03 (Adhesive Cell)", time: "32s", status: "COMPLETED" },
+      { step: 3, name: "Skateboard-to-Chassis Marriage", machine: "M-ASY-01 (Marriage Lift)", time: "68s", status: "IN PROGRESS" },
+      { step: 4, name: "Automated 5-Lug Wheel Torquing", machine: "M-ASY-02 (Multi-Torquer)", time: "32s", status: "QUEUED" },
+      { step: 5, name: "Coolant & Brake Evac & Fill", machine: "Fluid Vacuum Rig", time: "26s", status: "QUEUED" },
+    ];
+  }
+  if (dept === "QUALITY") {
+    return [
+      { step: 1, name: "Laser 4-Wheel Toe & Camber Align", machine: "M-QA-02 (Laser Arch)", time: "35s", status: "COMPLETED" },
+      { step: 2, name: "ADAS Forward Radar / LiDAR Calib", machine: "M-QA-03 (Target Bench)", time: "42s", status: "COMPLETED" },
+      { step: 3, name: "Chassis Dyno & 130 km/h Regen Run", machine: "M-QA-01 (Dyno Rollers)", time: "120s", status: "IN PROGRESS" },
+      { step: 4, name: "Monsoon 15-Bar Water Ingress Test", machine: "M-QA-04 (Rain Cell)", time: "180s", status: "QUEUED" },
+      { step: 5, name: "High-Intensity LED Tunnel Scan", machine: "Micro-Defect Scanner", time: "40s", status: "QUEUED" },
+    ];
+  }
+  // LOGISTICS
+  return [
+    { step: 1, name: "Supplier ASN Goods Receipt & Scan", machine: "Dock RFID Portal", time: "20s", status: "COMPLETED" },
+    { step: 2, name: "High-Bay Automated Crane Staging", machine: "M-LOG-02 (AS/RS Crane)", time: "45s", status: "COMPLETED" },
+    { step: 3, name: "Automated AGV Dispatch to Line", machine: "M-LOG-01 (AGV Tugger)", time: "120s", status: "IN PROGRESS" },
+    { step: 4, name: "Overhead Monorail Line Feed", machine: "M-LOG-04 (Monorail)", time: "35s", status: "QUEUED" },
+    { step: 5, name: "Kanban Buffer Synchronization", machine: "MES / ERP Gateway", time: "15s", status: "QUEUED" },
+  ];
+}
+
 function normalizeDept(name: string): string {
   const n = name.toUpperCase();
   if (n.includes("LOG")) return "LOGISTICS";
@@ -301,8 +791,27 @@ export default function DepartmentControlPanel({
     return propLightMode;
   });
   const [isRebalanced, setIsRebalanced] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "partsTable" | "telemetry">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "machines" | "partsTable">("overview");
   const [searchTerm, setSearchTerm] = useState("");
+  const components = DEPT_COMPONENTS[dept] ?? DEPT_COMPONENTS["ASSEMBLY"];
+  const deptMachines = DEPT_MACHINES[dept] ?? DEPT_MACHINES["ASSEMBLY"];
+  const [selectedPartCode, setSelectedPartCode] = useState<string>(components[0]?.code || "");
+  const [cycleElapsed, setCycleElapsed] = useState<number>(28);
+
+  // Live ticking manufacturing cycle timer
+  useEffect(() => {
+    const t = setInterval(() => {
+      setCycleElapsed((prev) => (prev >= 54 ? 1 : prev + 1));
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Update selected part when dept changes
+  useEffect(() => {
+    if (components.length > 0) {
+      setSelectedPartCode(components[0].code);
+    }
+  }, [dept, components]);
 
   const [chatInput, setChatInput] = useState("");
   const [chatLog, setChatLog] = useState([
@@ -323,7 +832,6 @@ export default function DepartmentControlPanel({
   const [isTyping, setIsTyping] = useState(false);
   const isOverload = dept === "ASSEMBLY" && !isRebalanced;
   const data = DEPT_DATA[dept] ?? DEPT_DATA["ASSEMBLY"];
-  const components = DEPT_COMPONENTS[dept] ?? DEPT_COMPONENTS["ASSEMBLY"];
 
   const filteredComponents = components.filter(
     (c) => c.code.toLowerCase().includes(searchTerm.toLowerCase()) || c.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -408,40 +916,55 @@ export default function DepartmentControlPanel({
           </span>
         </div>
 
-        {/* TABS & THEME CONTROLS */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ display: "flex", background: internalLightMode ? "#e2e8f0" : "rgba(0,0,0,0.4)", borderRadius: 6, padding: 2 }}>
-            <button
-              onClick={() => setActiveTab("overview")}
-              style={{
-                background: activeTab === "overview" ? accent : "transparent",
-                color: activeTab === "overview" ? "#000" : textMuted,
-                border: "none",
-                padding: "4px 12px",
-                borderRadius: 4,
-                fontSize: 10,
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              OVERVIEW
-            </button>
-            <button
-              onClick={() => setActiveTab("partsTable")}
-              style={{
-                background: activeTab === "partsTable" ? accent : "transparent",
-                color: activeTab === "partsTable" ? "#000" : textMuted,
-                border: "none",
-                padding: "4px 12px",
-                borderRadius: 4,
-                fontSize: 10,
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              PARTS CATALOG ({components.length})
-            </button>
-          </div>
+          {/* TABS & THEME CONTROLS */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ display: "flex", background: internalLightMode ? "#e2e8f0" : "rgba(0,0,0,0.4)", borderRadius: 6, padding: 2 }}>
+              <button
+                onClick={() => setActiveTab("overview")}
+                style={{
+                  background: activeTab === "overview" ? accent : "transparent",
+                  color: activeTab === "overview" ? (internalLightMode ? "#fff" : "#000") : textMuted,
+                  border: "none",
+                  padding: "4px 12px",
+                  borderRadius: 4,
+                  fontSize: 10,
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                OVERVIEW
+              </button>
+              <button
+                onClick={() => setActiveTab("machines")}
+                style={{
+                  background: activeTab === "machines" ? accent : "transparent",
+                  color: activeTab === "machines" ? (internalLightMode ? "#fff" : "#000") : textMuted,
+                  border: "none",
+                  padding: "4px 12px",
+                  borderRadius: 4,
+                  fontSize: 10,
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                MACHINES &amp; WORKSTATIONS ({deptMachines.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("partsTable")}
+                style={{
+                  background: activeTab === "partsTable" ? accent : "transparent",
+                  color: activeTab === "partsTable" ? (internalLightMode ? "#fff" : "#000") : textMuted,
+                  border: "none",
+                  padding: "4px 12px",
+                  borderRadius: 4,
+                  fontSize: 10,
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                PARTS &amp; LIVE TRACKER ({components.length})
+              </button>
+            </div>
 
           <button
             onClick={handleToggle}
@@ -696,71 +1219,398 @@ export default function DepartmentControlPanel({
         </div>
       )}
 
-      {/* TAB 2: COMPLETE PARTS MANUFACTURING TABLE */}
-      {activeTab === "partsTable" && (
-        <div className="dept-modal-card" style={{ marginTop: 4 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <div style={{ fontSize: 12, color: accent, fontWeight: "bold", letterSpacing: 1 }}>
-              BOM PARTS &amp; SUBASSEMBLY STATUS // {data.title}
+      {/* TAB 2: MACHINES & WORKSTATIONS */}
+      {activeTab === "machines" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Machine Fleet Summary Bar */}
+          <div className="glass-panel" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, padding: "12px 18px" }}>
+            <div>
+              <div style={{ fontSize: 9, color: textMuted }}>TOTAL ACTIVE MACHINES</div>
+              <div style={{ fontSize: 20, color: accent, fontWeight: "bold", fontFamily: "var(--font-mono)" }}>
+                {deptMachines.length} Units
+              </div>
+              <div style={{ fontSize: 9, color: accentGreen, marginTop: 2 }}>● 100% Online &amp; Synced</div>
             </div>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search part number or description..."
-              className="dept-chat-input"
-              style={{ width: 280 }}
-            />
+            <div>
+              <div style={{ fontSize: 9, color: textMuted }}>AVERAGE FLEET HEALTH</div>
+              <div style={{ fontSize: 20, color: accentGreen, fontWeight: "bold", fontFamily: "var(--font-mono)" }}>
+                {(deptMachines.reduce((acc, m) => acc + m.health, 0) / deptMachines.length).toFixed(1)}%
+              </div>
+              <div style={{ fontSize: 9, color: textMuted, marginTop: 2 }}>Predictive Maintenance OK</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 9, color: textMuted }}>LINE CONTROL MODE</div>
+              <div style={{ fontSize: 12, color: textPrimary, fontWeight: "bold", marginTop: 4 }}>
+                AUTOMATED PLC SYNCHRONIZED
+              </div>
+              <div style={{ fontSize: 9, color: textMuted }}>Profinet / OPC-UA Protocol</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 9, color: textMuted }}>TARGET SHIFT TAKT</div>
+              <div style={{ fontSize: 20, color: isOverload ? accentFault : accent, fontWeight: "bold", fontFamily: "var(--font-mono)" }}>
+                {isOverload ? "68s (Choked)" : "54s / Vehicle"}
+              </div>
+              <div style={{ fontSize: 9, color: isOverload ? accentFault : accentGreen }}>
+                {isOverload ? "▲ +26% over nominal" : "✓ Within takt tolerance"}
+              </div>
+            </div>
           </div>
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10, fontFamily: "var(--font-mono)" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left", color: textMuted }}>
-                  <th style={{ padding: "8px 10px" }}>PART NUMBER</th>
-                  <th style={{ padding: "8px 10px" }}>DESCRIPTION</th>
-                  <th style={{ padding: "8px 10px" }}>BATCH QTY</th>
-                  <th style={{ padding: "8px 10px" }}>STD CYCLE TIME</th>
-                  <th style={{ padding: "8px 10px" }}>COMPLETION</th>
-                  <th style={{ padding: "8px 10px" }}>LINE STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredComponents.map((c) => {
-                  const statusColor = c.statusType === "fault" ? accentFault : c.statusType === "warn" ? accentWarn : accentGreen;
-                  return (
-                    <tr key={c.code} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                      <td style={{ padding: "10px", color: accent, fontWeight: "bold" }}>{c.code}</td>
-                      <td style={{ padding: "10px", color: textPrimary }}>{c.name}</td>
-                      <td style={{ padding: "10px", color: textMuted }}>{c.qty} units</td>
-                      <td style={{ padding: "10px", color: textMuted }}>{c.stdHours} hrs/unit</td>
-                      <td style={{ padding: "10px", minWidth: 140 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
-                            <div style={{ width: `${c.pct}%`, height: "100%", background: statusColor }} />
-                          </div>
-                          <span style={{ color: statusColor, fontWeight: "bold" }}>{c.pct}%</span>
-                        </div>
-                      </td>
-                      <td style={{ padding: "10px" }}>
-                        <span
+          {/* Machine Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 14 }}>
+            {deptMachines.map((m) => {
+              const statusColor = m.statusType === "fault" ? accentFault : m.statusType === "warn" ? accentWarn : accentGreen;
+              return (
+                <div
+                  key={m.id}
+                  className="glass-panel"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 10,
+                    borderLeft: `4px solid ${statusColor}`,
+                  }}
+                >
+                  {/* Machine Header */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ color: accent, fontWeight: "bold", fontSize: 12, fontFamily: "var(--font-mono)" }}>{m.id}</span>
+                        <span style={{ fontSize: 9, color: textMuted }}>{m.type}</span>
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: "bold", color: textPrimary, marginTop: 4 }}>
+                        {m.name}
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        padding: "3px 8px",
+                        borderRadius: 4,
+                        fontSize: 9,
+                        fontWeight: "bold",
+                        fontFamily: "var(--font-mono)",
+                        border: `1px solid ${statusColor}`,
+                        color: statusColor,
+                        background: m.statusType === "fault" ? "rgba(239,68,68,0.12)" : "rgba(118,255,3,0.08)",
+                      }}
+                    >
+                      ● {m.status}
+                    </span>
+                  </div>
+
+                  {/* Telemetry Readout */}
+                  <div style={{ background: internalLightMode ? "#f1f5f9" : "rgba(0,0,0,0.3)", padding: "10px 12px", borderRadius: 6, fontSize: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ color: textMuted }}>{m.metricLabel}:</span>
+                      <span style={{ color: accent, fontWeight: "bold", fontFamily: "var(--font-mono)" }}>{m.metricValue}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: textMuted }}>Cycle Speed:</span>
+                      <span style={{ color: textPrimary, fontFamily: "var(--font-mono)" }}>{m.cycleTime}</span>
+                    </div>
+                  </div>
+
+                  {/* Active Part in Manufacturing */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 10, borderTop: "1px solid var(--border)", paddingTop: 8 }}>
+                    <div>
+                      <div style={{ color: textMuted, fontSize: 8 }}>CURRENT PART IN OPERATION:</div>
+                      <div style={{ fontWeight: "bold", color: textPrimary }}>
+                        <span style={{ color: accent }}>{m.currentPart}</span> · {m.partName}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedPartCode(m.currentPart);
+                        setActiveTab("partsTable");
+                      }}
+                      className="req-btn"
+                      style={{ padding: "4px 8px", fontSize: 9, background: "rgba(0, 229, 255, 0.12)", color: accent }}
+                      title="Open Live Part Tracker for this component"
+                    >
+                      TRACK PART ⚡
+                    </button>
+                  </div>
+
+                  {/* Health Bar & Operator */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 9, color: textMuted, paddingTop: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span>Health:</span>
+                      <div style={{ width: 60, height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 2, overflow: "hidden" }}>
+                        <div style={{ width: `${m.health}%`, height: "100%", background: m.health > 90 ? accentGreen : accentWarn }} />
+                      </div>
+                      <span style={{ color: m.health > 90 ? accentGreen : accentWarn, fontWeight: "bold" }}>{m.health}%</span>
+                    </div>
+                    <div>Operator: <strong style={{ color: textPrimary }}>{m.operator}</strong></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: COMPLETE PARTS MANUFACTURING & LIVE TRACKING */}
+      {activeTab === "partsTable" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* LIVE PART PROCESS TRACKER BANNER */}
+          {(() => {
+            const currentSelectedPart = components.find((c) => c.code === selectedPartCode) || components[0];
+            const stages = getPartProcessStages(currentSelectedPart.code, dept);
+            const activeMachine = deptMachines.find((m) => m.currentPart === currentSelectedPart.code) || deptMachines[0];
+
+            return (
+              <div
+                className="glass-panel"
+                style={{
+                  padding: 16,
+                  border: `1px solid ${accent}`,
+                  background: internalLightMode ? "#ffffff" : "rgba(0, 229, 255, 0.04)",
+                  boxShadow: "0 0 15px rgba(0, 229, 255, 0.08)",
+                }}
+              >
+                {/* Header row with selector and live badge */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span
+                      style={{
+                        background: accent,
+                        color: internalLightMode ? "#ffffff" : "#000000",
+                        padding: "3px 8px",
+                        fontSize: 9,
+                        fontWeight: "bold",
+                        borderRadius: 3,
+                        letterSpacing: 1,
+                      }}
+                    >
+                      LIVE PART TRACKER
+                    </span>
+                    <span style={{ fontSize: 13, fontWeight: "bold", color: textPrimary }}>
+                      {currentSelectedPart.code} — {currentSelectedPart.name}
+                    </span>
+                  </div>
+
+                  {/* Dropdown Part Switcher */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 10, color: textMuted }}>SELECT COMPONENT:</span>
+                    <select
+                      value={currentSelectedPart.code}
+                      onChange={(e) => setSelectedPartCode(e.target.value)}
+                      className="dept-chat-input"
+                      style={{ fontSize: 10, padding: "4px 8px", cursor: "pointer" }}
+                    >
+                      {components.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.code} - {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Part Meta Strip */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, background: internalLightMode ? "#f8fafc" : "rgba(0,0,0,0.25)", padding: "10px 14px", borderRadius: 6, fontSize: 10, marginBottom: 14 }}>
+                  <div>
+                    <span style={{ color: textMuted, display: "block", fontSize: 8 }}>ACTIVE VIN / LOT:</span>
+                    <strong style={{ color: accent, fontFamily: "var(--font-mono)" }}>VIN-2026-X80-0042</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: textMuted, display: "block", fontSize: 8 }}>BATCH QUANTITY:</span>
+                    <strong style={{ color: textPrimary }}>{currentSelectedPart.qty} Units</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: textMuted, display: "block", fontSize: 8 }}>ACTIVE WORKSTATION:</span>
+                    <strong style={{ color: textPrimary }}>{activeMachine ? activeMachine.name : "Station Alpha"}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: textMuted, display: "block", fontSize: 8 }}>STATION OPERATOR:</span>
+                    <strong style={{ color: textPrimary }}>{activeMachine ? activeMachine.operator : "Lead Technician"}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: textMuted, display: "block", fontSize: 8 }}>QUALITY VERIFICATION:</span>
+                    <strong style={{ color: accentGreen }}>TOLERANCE ±0.02mm (PASS ✓)</strong>
+                  </div>
+                </div>
+
+                {/* Animated Cycle Progress Bar */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, fontSize: 10 }}>
+                    <span style={{ color: textPrimary, fontWeight: "bold" }}>
+                      Live Takt Progress:{" "}
+                      <span style={{ color: accent, fontFamily: "var(--font-mono)" }}>
+                        {cycleElapsed}s elapsed / 54s takt cycle
+                      </span>
+                    </span>
+                    <span style={{ color: accentGreen, fontWeight: "bold", fontFamily: "var(--font-mono)" }}>
+                      {Math.min(100, Math.round((cycleElapsed / 54) * 100))}% OF CURRENT OPERATION
+                    </span>
+                  </div>
+                  <div style={{ height: 8, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${Math.min(100, Math.round((cycleElapsed / 54) * 100))}%`,
+                        background: "linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%)",
+                        transition: "width 1s linear",
+                        boxShadow: "0 0 8px var(--accent)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 5-Stage Step-by-Step Production Process Lineage */}
+                <div>
+                  <div style={{ fontSize: 9, color: textMuted, fontWeight: "bold", letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>
+                    Step-by-Step Manufacturing Process Lineage
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
+                    {stages.map((st) => {
+                      const isComplete = st.status === "COMPLETED";
+                      const isInProgress = st.status === "IN PROGRESS";
+                      const borderCol = isInProgress ? accent : isComplete ? accentGreen : "var(--border)";
+                      const bgCol = isInProgress
+                        ? "rgba(0, 229, 255, 0.12)"
+                        : isComplete
+                        ? "rgba(118, 255, 3, 0.08)"
+                        : "rgba(255, 255, 255, 0.02)";
+
+                      return (
+                        <div
+                          key={st.step}
                           style={{
-                            padding: "3px 8px",
-                            borderRadius: 4,
-                            border: `1px solid ${statusColor}`,
-                            color: statusColor,
-                            fontWeight: "bold",
-                            fontSize: 9,
+                            border: `1px solid ${borderCol}`,
+                            background: bgCol,
+                            padding: "8px 10px",
+                            borderRadius: 6,
+                            position: "relative",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 4,
                           }}
                         >
-                          {c.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: 8, color: textMuted, fontFamily: "var(--font-mono)" }}>
+                              STEP 0{st.step}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 8,
+                                fontWeight: "bold",
+                                color: isInProgress ? accent : isComplete ? accentGreen : textMuted,
+                              }}
+                            >
+                              {isComplete ? "✓ DONE" : isInProgress ? "⚡ ACTIVE" : "⏳ QUEUE"}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 10, fontWeight: "bold", color: textPrimary, lineHeight: 1.3 }}>
+                            {st.name}
+                          </div>
+                          <div style={{ fontSize: 8, color: textMuted, marginTop: "auto" }}>
+                            {st.machine} ({st.time})
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* BOM PARTS TABLE */}
+          <div className="dept-modal-card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: accent, fontWeight: "bold", letterSpacing: 1 }}>
+                BOM PARTS &amp; SUBASSEMBLY STATUS // {data.title}
+              </div>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search part number or description..."
+                className="dept-chat-input"
+                style={{ width: 280 }}
+              />
+            </div>
+
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10, fontFamily: "var(--font-mono)" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left", color: textMuted }}>
+                    <th style={{ padding: "8px 10px" }}>PART NUMBER</th>
+                    <th style={{ padding: "8px 10px" }}>DESCRIPTION</th>
+                    <th style={{ padding: "8px 10px" }}>BATCH QTY</th>
+                    <th style={{ padding: "8px 10px" }}>STD CYCLE TIME</th>
+                    <th style={{ padding: "8px 10px" }}>COMPLETION</th>
+                    <th style={{ padding: "8px 10px" }}>LINE STATUS</th>
+                    <th style={{ padding: "8px 10px", textAlign: "right" }}>LIVE TRACKING</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredComponents.map((c) => {
+                    const statusColor = c.statusType === "fault" ? accentFault : c.statusType === "warn" ? accentWarn : accentGreen;
+                    const isSelected = c.code === selectedPartCode;
+                    return (
+                      <tr
+                        key={c.code}
+                        style={{
+                          borderBottom: "1px solid rgba(255,255,255,0.04)",
+                          background: isSelected ? "rgba(0, 229, 255, 0.08)" : "transparent",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => setSelectedPartCode(c.code)}
+                      >
+                        <td style={{ padding: "10px", color: accent, fontWeight: "bold" }}>
+                          {c.code} {isSelected && "▶"}
+                        </td>
+                        <td style={{ padding: "10px", color: textPrimary }}>{c.name}</td>
+                        <td style={{ padding: "10px", color: textMuted }}>{c.qty} units</td>
+                        <td style={{ padding: "10px", color: textMuted }}>{c.stdHours} hrs/unit</td>
+                        <td style={{ padding: "10px", minWidth: 140 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
+                              <div style={{ width: `${c.pct}%`, height: "100%", background: statusColor }} />
+                            </div>
+                            <span style={{ color: statusColor, fontWeight: "bold" }}>{c.pct}%</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: "10px" }}>
+                          <span
+                            style={{
+                              padding: "3px 8px",
+                              borderRadius: 4,
+                              border: `1px solid ${statusColor}`,
+                              color: statusColor,
+                              fontWeight: "bold",
+                              fontSize: 9,
+                            }}
+                          >
+                            {c.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "10px", textAlign: "right" }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedPartCode(c.code);
+                            }}
+                            className="req-btn"
+                            style={{
+                              padding: "3px 8px",
+                              fontSize: 9,
+                              background: isSelected ? accent : "transparent",
+                              color: isSelected ? (internalLightMode ? "#ffffff" : "#000000") : accent,
+                              borderColor: accent,
+                            }}
+                          >
+                            {isSelected ? "TRACKING ACTIVE ●" : "TRACK LIVE ⚡"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
