@@ -12,13 +12,6 @@
 
 ---
 
-## 📸 Application Preview
-
-![APEX-Twin Planning Parameters & Authoritative Capacity Preview](docs/screenshots/planning_parameters.png)
-*Live Operational Planning Parameters, Real-Time OEE Decomposition, 7-Day Planning Horizon Simulation, and Persistent Audit Logging.*
-
----
-
 ## 🏭 1. The 7-Department Automotive Manufacturing Plant
 
 APEX-Twin models the complete production sequence of an electric passenger vehicle across 7 physical workstations:
