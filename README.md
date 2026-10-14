@@ -264,9 +264,31 @@ npm start
 
 ---
 
-## 🤖 9. APEX Check-and-Support Autonomous Agents (Challenger & Champion)
+## 🤖 9. Unified AI & Autonomous Intelligence Center
 
-APEX-Twin features a self-healing, multi-agent cybernetic supervisor loop consisting of two cooperating agents: **Challenger** (Continuous Auditor & QA) and **Champion** (Automated Fixer). Neither agent is trusted blindly, and the main branch is protected from direct modification.
+APEX-Twin features a unified **Cyber-Physical Intelligence Architecture** accessible via **`🤖 AI & AUTONOMOUS INTELLIGENCE`** (`http://localhost:3000/agents`). Rather than treating predictive forecasting and autonomous code repair as isolated silos, the platform unifies them into a **closed-loop cybernetic supervisor**:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        UNIFIED AI & AUTONOMOUS INTELLIGENCE                            │
+├────────────────────────────────────────┬───────────────────────────────────────────────┤
+│  LAYER 1: AUTONOMOUS CODING AGENTS     │  LAYER 2: PREDICTIVE CAPACITY MLOps           │
+│  Engine: Qwen 2.5 Coder (7B / 32B)     │  Engine: LightGBM Quantile Regressors         │
+│  Role: Self-Healing Software & QA Audit│  Role: Throughput & Bottleneck Forecasting    │
+└────────────────────────────────────────┴───────────────────────────────────────────────┘
+                                         │
+                         AUTOMATED SYNERGY CLOSED LOOP:
+                                         │
+    1. Sensor drift or variance spike occurs on the physical assembly line
+    2. Challenger Agent detects 'model_drift' finding via continuous audit probe
+    3. Champion Agent automatically dispatches /api/models/retrain pipeline
+    4. Evaluates new Challenger Model against production Champion on out-of-sample data
+    5. Zero-downtime hot promotion if metrics improve; instant rollback if degraded
+```
+
+### The Check-and-Support Supervisor Loop (Challenger & Champion)
+
+The dual-agent coding loop ensures neither agent is trusted blindly, and the `main` branch is protected from direct modification:
 
 ```
         ┌──────────────── every AGENT_INTERVAL_S ────────────────┐
@@ -290,6 +312,22 @@ APEX-Twin features a self-healing, multi-agent cybernetic supervisor loop consis
         │
         └── next cycle: Challenger re-verifies old fixes; regression => reopen + objection logged
 ```
+
+### Dual-Tab Control Room Features (`http://localhost:3000/agents`)
+
+- **Tab 1 — Autonomous Agents (Challenger & Champion):**
+  - Interactive 4-step workflow architecture diagram.
+  - Live system findings table with test IDs, severity, and fingerprint deduplication.
+  - Gated fix branches table tracking isolated worktree diffs.
+  - Real-time audit log stream (`activity.jsonl`).
+  - Interactive "Trigger Agent Cycle" dispatch button.
+
+- **Tab 2 — Production MLOps Forecasting & Retraining:**
+  - Production Champion vs Challenger model card with $P50, P75, P90$ metrics.
+  - Real-time sensor Data Drift Monitor with PSI feature scores.
+  - Automated retrain job execution terminal, Challenger promotion, and rollback controls.
+  - Chronological model registry history table.
+  *(Note: Visiting `/models/retraining` automatically opens this view with the MLOps tab pre-selected).*
 
 ### Agent Setup & Playbook
 
