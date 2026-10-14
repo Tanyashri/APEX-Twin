@@ -239,19 +239,10 @@ export default function TwinDashboard() {
           <Link
             href="/agents"
             className="req-btn"
-            style={{ padding: "4px 10px", fontSize: 9, textDecoration: "none", borderColor: "var(--accent)" }}
-            title="APEX Autonomous Check-and-Support Agents"
+            style={{ padding: "4px 12px", fontSize: 9, textDecoration: "none", borderColor: "var(--accent)", color: "var(--accent)", fontWeight: "bold" }}
+            title="Unified AI & Autonomous Intelligence (Agents + Predictive MLOps)"
           >
-            🤖 APEX AGENTS
-          </Link>
-
-          <Link
-            href="/models/retraining"
-            className="req-btn"
-            style={{ padding: "4px 10px", fontSize: 9, textDecoration: "none" }}
-            title="Model Retraining & Drift Registry"
-          >
-            ⚙ AI RETRAINING
+            🤖 AI &amp; AUTONOMOUS INTELLIGENCE
           </Link>
 
           <Link
