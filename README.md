@@ -262,39 +262,107 @@ npm start
 
 ---
 
-## 🧪 9. Automated Verification Suite
+---
 
-APEX-Twin includes 39 unit, integration, and mathematical boundary tests:
+## 🤖 9. APEX Check-and-Support Autonomous Agents (Challenger & Champion)
 
-```bash
-pytest backend/tests -v
+APEX-Twin features a self-healing, multi-agent cybernetic supervisor loop consisting of two cooperating agents: **Challenger** (Continuous Auditor & QA) and **Champion** (Automated Fixer). Neither agent is trusted blindly, and the main branch is protected from direct modification.
+
+```
+        ┌──────────────── every AGENT_INTERVAL_S ────────────────┐
+        ▼                                                         │
+ CHALLENGER: pytest + API Probes + Invariants + LLM Edge-Case Fuzzing
+        │ findings (deduped by SHA1 fingerprint, saved to SQLite + JSONL)
+        ▼
+ CHAMPION: picks fix method -> proposes patch in isolated git worktree
+        │ proposed diff (60 lines max)
+        ▼
+ CHALLENGER 7-GATE AUDIT (can OPPOSE):
+        │   1. Scope (backend/app/ only; tests/config protected)
+        │   2. Size (<= 60 lines)
+        │   3. No Error Suppression / Test Skipping
+        │   4. Target Issue Resolved (re-tested in worktree)
+        │   5. Zero Regressions (all baseline tests still pass)
+        │   6. Syntax & Ruff Lint Clean
+        │   7. LLM Skeptical Senior Reviewer
+        │
+   approve ──> branch agent/fix-<id> (never merged to main)      oppose ──> objections fed back, retry (max 3x) ──> escalate to human
+        │
+        └── next cycle: Challenger re-verifies old fixes; regression => reopen + objection logged
 ```
 
-```text
-backend/tests/test_capacity.py ....                                      [ 10%]
-backend/tests/test_main.py .                                             [ 12%]
-backend/tests/test_ml.py ....                                            [ 23%]
-backend/tests/test_monitoring.py ...                                     [ 30%]
-backend/tests/test_phase1.py ...                                         [ 38%]
-backend/tests/test_planning_capacity_authoritative.py .....              [ 51%]
-backend/tests/test_retraining_flow.py ......                             [ 66%]
-backend/tests/test_scheduling.py ...                                     [ 74%]
-backend/tests/test_simulation.py ..                                      [ 79%]
-backend/tests/test_tracking.py ....                                      [ 89%]
-backend/tests/test_workforce.py ....                                     [100%]
+### Agent Setup & Playbook
 
-======================= 39 passed in 58.76s =======================
+#### One-Time Setup
+```bash
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Option A: Local LLM via Ollama (Recommended)
+ollama pull qwen2.5-coder:7b
+export AGENT_LLM_BACKEND=ollama
+export OLLAMA_MODEL=qwen2.5-coder:7b
+
+# Option B: Hugging Face Inference API
+pip install huggingface_hub
+export AGENT_LLM_BACKEND=hf
+export HF_TOKEN=hf_your_token_here
+export HF_MODEL=Qwen/Qwen2.5-Coder-32B-Instruct
+```
+
+#### CLI Operations
+```bash
+# Run one full test -> fix -> audit cycle
+python -m agents once
+
+# Run continuous background monitoring loop
+python -m agents loop
+
+# View recent runs, detected findings, and gated fixes
+python -m agents report
+
+# Tail live activity log stream in real time
+python -m agents tail
+
+# Run end-to-end multi-agent verification suite (with scripted mock LLM)
+python -m pytest agents/tests -q
+```
+
+### Reviewing and Merging an Approved Fix
+When the Challenger approves a patch, it commits the fix to an isolated branch `agent/fix-<id>`. To inspect and merge:
+```bash
+# Inspect patch against main
+git diff main..agent/fix-1
+
+# Merge to main when verified
+git merge agent/fix-1
 ```
 
 ---
 
-## 📜 10. Engineering Standards & Compliance
+## 🧪 10. Automated Verification Suite
+
+APEX-Twin includes unit, integration, mathematical boundary, and multi-agent test suites:
+
+```bash
+# Run backend authoritative engineering & model tests
+pytest backend/tests -v
+
+# Run autonomous agent check-and-support loop proof
+pytest agents/tests -q
+```
+
+---
+
+## 📜 11. Engineering Standards & Compliance
 
 - **ISO 22400-2**: Key Performance Indicators for Manufacturing Operations Management (OEE, Availability, Net Productive Time).
 - **Lean Manufacturing**: Takt time analysis, line balancing, and buffer starvation minimization.
 - **MLOps Production Standards**: Continuous chronological holdout testing, champion-challenger registration, and audited model promotion.
+- **Cybernetic Self-Healing**: Gated dual-agent architecture enforcing deterministic constraints and isolated worktree sandboxing.
 
 ---
 
-## 📄 11. License
+## 📄 12. License
 This project is licensed under the **MIT License** — open and accessible for advanced research and enterprise digital twin applications.
+
